@@ -117,7 +117,7 @@ kodi-send -a "Action(UP)" -d $send_delay
 kodi-send -a "Action(Select)" -d $send_delay
 kodi-send -a "ActivateWindow(10000)"
 
-apt-get install -y kodi21-vfs-rar kodi21-vfs-libarchive kodi-pvr-iptvsimple kodi21-inputstream-adaptive kodi21-inputstream-ffmpegdirect
+apt-get install -y kodi21-vfs-rar kodi21-vfs-libarchive kodi21-pvr-iptvsimple kodi21-inputstream-adaptive kodi21-inputstream-ffmpegdirect
 
 #kodi-send -a "RestartApp"
 systemctl restart kodi.service
