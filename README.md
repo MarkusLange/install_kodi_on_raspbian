@@ -1,7 +1,6 @@
-# install kodi on raspbian trixie
-install kodi on raspbian bookworm/trixie
+# install kodi on raspbian bookworm/trixie
 
-this little script installs kodi on raspbian trixie (lite) I put some expense in it so there are some points it does
+this little script installs kodi on raspbian bookworm/trixie (lite) I put some expense in it so there are some points it does
 * install kodi on the active user
 * creats a service for it (systemd)
 * it let you run the webinterface with previleged rights so the webinterface is on port 80
@@ -17,7 +16,7 @@ System should be up to date
 
 Just get it with (bookworm):
 
-`wget https://raw.githubusercontent.com/MarkusLange/install_kodi_on_raspbian_trixie/refs/heads/main/install_kodi_bookworm.bash`
+`wget https://raw.githubusercontent.com/MarkusLange/install_kodi_on_raspbian/refs/heads/main/install_kodi_bookworm.bash`
 
 Make it executable:
 
@@ -29,7 +28,7 @@ Execute it:
 
 Just get it with (trixie):
 
-`wget https://raw.githubusercontent.com/MarkusLange/install_kodi_on_raspbian_trixie/refs/heads/main/install_kodi_trixie.bash`
+`wget https://raw.githubusercontent.com/MarkusLange/install_kodi_on_raspbian/refs/heads/main/install_kodi_trixie.bash`
 
 Make it executable:
 
