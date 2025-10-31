@@ -14,26 +14,14 @@ this little script installs kodi on raspbian bookworm/trixie (lite) I put some e
 
 System should be up to date
 
-Just get it with (bookworm):
+Just get it with:
 
-`wget https://raw.githubusercontent.com/MarkusLange/install_kodi_on_raspbian/refs/heads/main/install_kodi_bookworm.bash`
-
-Make it executable:
-
-`chmod +x install_kodi_bookworm.bash`
-
-Execute it:
-
-`sudo ./install_kodi_bookworm.bash`
-
-Just get it with (trixie):
-
-`wget https://raw.githubusercontent.com/MarkusLange/install_kodi_on_raspbian/refs/heads/main/install_kodi_trixie.bash`
+`wget https://raw.githubusercontent.com/MarkusLange/install_kodi_on_raspbian/refs/heads/main/install_kodi_on_raspbian.bash`
 
 Make it executable:
 
-`chmod +x install_kodi_trixie.bash`
+`chmod +x install_kodi_on_raspbian.bash`
 
 Execute it:
 
-`sudo ./install_kodi_trixie.bash`
+`sudo ./install_kodi_on_raspbian.bash`
