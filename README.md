@@ -1,5 +1,4 @@
-# install kodi on raspbian trixie
-install kodi on raspbian bookworm/trixie
+# install kodi on raspbian bookworm/trixie
 
 this little script installs kodi on raspbian trixie (lite) I put some expense in it so there are some points it does
 * install kodi on the active user
