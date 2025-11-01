@@ -207,4 +207,13 @@ do
   esac
 done
 
-echo "done"
+case $codename in
+bookworm)
+	;;
+trixie)
+	#install versionceck
+	kodi-send -a "InstallAddon(service.xbmc.versioncheck)" -d $send_delay
+	kodi-send -a "SetFocus(11)" -d $send_delay
+	kodi-send -a "Action(Select)" -d $send_delay
+	;;
+esac
