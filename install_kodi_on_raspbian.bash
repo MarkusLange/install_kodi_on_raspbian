@@ -12,6 +12,7 @@ case $codename in
 bookworm)
 	#install Kodi21 on bookworm
 	apt-get install -y kodi21 kodi21-eventclients-kodi-send
+	#https://discourse.coreelec.org/t/kodi-send-missing-module/53926/3
 	export PYTHONPATH=/usr/lib/python3.11/site-packages/kodi
 	;;
 trixie)
@@ -67,6 +68,9 @@ EOF
 	;;
 esac
 
+#read -n 1 -s -r -p "Press any key to continue"
+#sed -i "/debugging/ s/false/true/" /usr/share/kodi/addons/skin.estuary/addon.xml
+
 systemctl daemon-reload
 systemctl enable kodi.service
 systemctl start kodi.service
@@ -97,10 +101,10 @@ kodi-send -a "InhibitScreensaver(true)"
 
 #enable version check (bookworm), enable spectrum (trixie)
 kodi-send -a "SetFocus(11)" -d $send_delay
-kodi-send -a "Action(Select)" -d $send_delay
+kodi-send -a "Action(Select, 10100)" -d $send_delay
 
 kodi-send -a "SetFocus(28)" -d $send_delay
-kodi-send -a "Action(Select)" -d $send_delay
+kodi-send -a "Action(Select, 10140)" -d $send_delay
 
 #enable service webinterface & json on port 80
 kodi-send -a "ActivateWindow(10018)" -d $send_delay
@@ -120,7 +124,7 @@ kodi-send -a "Action(Select)" -d $send_delay
 kodi-send -a "SetFocus(-178)" -d $send_delay
 kodi-send -a "Action(Backspace)" -d $send_delay
 kodi-send -a "Action(Backspace)" -d $send_delay
-kodi-send -a "ActivateWindow(10000)"
+kodi-send -a "ActivateWindow(10000)" -d $send_delay
 
 #install chorus webinterface
 kodi-send -a "InstallAddon(webinterface.chorus)" -d $send_delay
@@ -140,11 +144,11 @@ kodi-send -a "Action(Select)" -d $send_delay
 
 kodi-send -a "Action(UP)" -d $send_delay
 kodi-send -a "Action(Select)" -d $send_delay
-kodi-send -a "ActivateWindow(10000)"
+kodi-send -a "ActivateWindow(10000)" -d $send_delay
 
 case $codename in
 bookworm)
-	apt-get install -y kodi21-vfs-rar kodi21-vfs-libarchive kodi21-pvr-iptvsimple kodi21-inputstream-adaptive kodi21-inputstream-ffmpegdirect
+	apt-get install -y kodi21-vfs-rar kodi21-vfs-libarchive kodi21-pvr-iptvsimple kodi21-inputstream-adaptive kodi21-inputstream-ffmpegdirect kodi21-visualization-spectrum
 	;;
 trixie)
 	wget https://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2024.9.1_all.deb
@@ -168,7 +172,6 @@ Pin-Priority: 100
 EOF
 
 	apt-get update
-	
 	apt-get install -y kodi-vfs-rar kodi-vfs-libarchive kodi-pvr-iptvsimple kodi-inputstream-adaptive kodi-inputstream-ffmpegdirect
 	;;
 esac
@@ -189,26 +192,32 @@ do
 
   case $window_id in
   10100)
+		sleep 0.5
         kodi-send -a "SetFocus(11)" -d $send_delay
         kodi-send -a "Action(Select)" -d $send_delay
-        sleep 0.5
+		sleep 0.5
         ;;
   10140)
         sleep 0.5
         kodi-send -a "SetFocus(28)" -d $send_delay
         kodi-send -a "Action(Select)" -d $send_delay
-        sleep 0.5
+		sleep 0.5
         ;;
   12000)
+		sleep 0.5
         kodi-send -a "SetFocus(7)" -d $send_delay
         kodi-send -a "Action(Select)" -d $send_delay
-        sleep 0.5
+		sleep 0.5
         ;;
   esac
 done
 
 case $codename in
 bookworm)
+	#install spectrum with the reboot of kodi before after chorus installation kodi21-visualization-spectrum
+	#kodi-send -a "InstallAddon(visualization.spectrum)" -d $send_delay
+	#kodi-send -a "SetFocus(11)" -d $send_delay
+	#kodi-send -a "Action(Select)" -d $send_delay
 	;;
 trixie)
 	#install versionceck
@@ -217,3 +226,7 @@ trixie)
 	kodi-send -a "Action(Select)" -d $send_delay
 	;;
 esac
+
+#sed -i "/debugging/ s/true/false/" /usr/share/kodi/addons/skin.estuary/addon.xml
+
+systemctl restart kodi.service
