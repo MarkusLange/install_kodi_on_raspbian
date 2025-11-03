@@ -5,6 +5,11 @@ architecture=$(dpkg --print-architecture)
 
 #sudo apt update && sudo apt dist-upgrade -y && sudo reboot
 
+#set cma memory to 512
+#https://forums.raspberrypi.com/viewtopic.php?t=378418
+#https://askubuntu.com/questions/537967/appending-to-end-of-a-line-using-sed
+sed -i '/vc4-kms-v3d/ s/$/,cma-512/' /boot/firmware/config.txt
+
 #install video driver
 apt-get install -y libgl1-mesa-dri mesa-utils
 
@@ -34,7 +39,8 @@ After = systemd-user-sessions.service network.target sound.target mysql.service
 Wants = mysql.service
 
 [Service]
-ExecStartPre=+setcap 'cap_net_bind_service=+ep' /usr/lib/aarch64-linux-gnu/kodi/kodi.bin
+#ExecStartPre=+setcap 'cap_net_bind_service=+ep' /usr/lib/aarch64-linux-gnu/kodi/kodi.bin
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 User = $user
 #Group = input
 Type = simple
