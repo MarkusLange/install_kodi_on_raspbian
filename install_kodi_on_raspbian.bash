@@ -159,6 +159,7 @@ bookworm)
 trixie)
 	wget https://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2024.9.1_all.deb
 	dpkg -i deb-multimedia-keyring_2024.9.1_all.deb
+	rm -f deb-multimedia-keyring_2024.9.1_all.deb
 
 cat > /etc/apt/sources.list.d/dmo.sources << EOF
 Types: deb
@@ -189,6 +190,7 @@ sleep 30
 
 window_id=-1
 
+#https://forum.kodi.tv/showthread.php?tid=175418
 echo "enter loop"
 while [[ $window_id != 10000 ]]
 do
