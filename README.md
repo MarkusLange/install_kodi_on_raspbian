@@ -1,6 +1,6 @@
-# install kodi on raspbian bookworm/trixie
+# install kodi on raspbian bookworm/trixie lite
 
-this little script installs kodi on raspbian bookworm/trixie (lite) I put some expense in it so there are some points it does
+this little script installs kodi on raspbian bookworm/trixie (lite is assumed) I put some expense in it so there are some points it does
 * install kodi on the active user
 * creats a service for it (systemd)
 * it let you run the webinterface with previleged rights so the webinterface is on port 80
