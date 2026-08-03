@@ -9,8 +9,10 @@ this little script installs kodi on raspbian bookworm/trixie (lite is assumed) I
 * it installs iptvsimple
 * add polkit rules to the user who runs kodi so you can shut it down from the interface (trixie only)
 * creates advancedsettings to show the temperatue of the pi correctly
-* installs chorus as webinterface
+* installs a webinterface of your choise (Arch, AWXi, Chorus, Chorus2, Hax, PartyMode, Tex) or none
 * preconfigure the addons with kodi-send and json
+
+Now with some whiptail gui parts
 
 System should be up to date
 

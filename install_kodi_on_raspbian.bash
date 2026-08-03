@@ -1,7 +1,32 @@
 #!/bin/bash
 user=$(logname)
+group=$(id -gn $user)
+home_path="/home/$user"
+
 codename=$(cat /etc/os-release | grep ^VERSION= | cut -d'(' -f2 | cut -d')' -f1)
 architecture=$(dpkg --print-architecture)
+
+kodi_version=$(apt-cache policy kodi | head -3 | tail -1 | cut -d' ' -f4 | cut -d':' -f2 | cut -d'+' -f1)
+
+whiptail --title "Installation Information" --no-button "Exit" --yesno \
+"This script installs Kodi "$kodi_version" \n\
+on "$codename" under user "$user"\n\
+\n\
+With:\n\
+Archive support\n\
+iptv simple\n\
+add settings to show the temperatue of the pi correctly\n\
+a webinterface of your choise\n\
+and an systemd service for automatic startup" 15 60 3>&1 1>&2 2>&3
+
+output=$?
+
+case $output in
+0)
+	;;
+1)
+	exit;;
+esac
 
 #sudo apt update && sudo apt dist-upgrade -y && sudo reboot
 
@@ -31,7 +56,7 @@ cat > /etc/systemd/system/kodi.service << EOF
 [Unit]
 Description = Kodi Media Center
 # if you don't need the MySQL DB backend, this should be sufficient
-#After = systemd-user-sessions.service networ.target sound.target pulseaudio.service pulseaudio.socket
+# After = systemd-user-sessions.service networ.target sound.target pulseaudio.service pulseaudio.socket
 
 # After = systemd-user-sessions.service network.target sound.target
 # if you need the MySQL DB backend, use this block instead of the previous
@@ -44,7 +69,8 @@ AmbientCapabilities=CAP_NET_BIND_SERVICE
 User = $user
 #Group = input
 Type = simple
-ExecStart = /usr/bin/kodi --standalone
+#ExecStart = /usr/bin/kodi --standalone
+ExecStart = /usr/bin/kodi-standalone
 #Restart = always
 Restart = on-abort
 RestartSec = 15
@@ -98,12 +124,14 @@ cat > /home/$user/.kodi/userdata/advancedsettings.xml << EOF
 	<gputempcommand>vcgencmd measure_temp | /bin/sed -e "s/temp=//" -e "s/\..*'/ /"</gputempcommand>
 </advancedsettings>
 EOF
+chown $user:$group /home/$user/.kodi/userdata/advancedsettings.xml
 
-send_delay=250
+send_delay=350
 echo "pause for 30 seconds for kodi to startup"
 sleep 30
 
 kodi-send -a "InhibitScreensaver(true)"
+#exit
 
 #enable version check (bookworm), enable spectrum (trixie)
 kodi-send -a "SetFocus(11)" -d $send_delay
@@ -130,26 +158,6 @@ kodi-send -a "Action(Select)" -d $send_delay
 kodi-send -a "SetFocus(-178)" -d $send_delay
 kodi-send -a "Action(Backspace)" -d $send_delay
 kodi-send -a "Action(Backspace)" -d $send_delay
-kodi-send -a "ActivateWindow(10000)" -d $send_delay
-
-#install chorus webinterface
-kodi-send -a "InstallAddon(webinterface.chorus)" -d $send_delay
-kodi-send -a "SetFocus(11)" -d $send_delay
-kodi-send -a "Action(Select)" -d $send_delay
-
-kodi-send -a "Notification(Please wait,Just 60 seconds,60000))"
-#read -n 1 -s -r -p "Press any key to continue"
-
-sleep 60
-
-kodi-send -a "ActivateWindow(10018)" -d $send_delay
-kodi-send -a "SetFocus(-199)" -d $send_delay
-
-kodi-send -a "SetFocus(-173)" -d $send_delay
-kodi-send -a "Action(Select)" -d $send_delay
-
-kodi-send -a "Action(UP)" -d $send_delay
-kodi-send -a "Action(Select)" -d $send_delay
 kodi-send -a "ActivateWindow(10000)" -d $send_delay
 
 case $codename in
@@ -219,10 +227,11 @@ do
         ;;
   esac
 done
+echo "end loop"
 
 case $codename in
 bookworm)
-	#install spectrum with the reboot of kodi before after chorus installation kodi21-visualization-spectrum
+	#install spectrum with the reboot of kodi, line ~141, kodi21-visualization-spectrum
 	#kodi-send -a "InstallAddon(visualization.spectrum)" -d $send_delay
 	#kodi-send -a "SetFocus(11)" -d $send_delay
 	#kodi-send -a "Action(Select)" -d $send_delay
@@ -238,3 +247,109 @@ esac
 #sed -i "/debugging/ s/true/false/" /usr/share/kodi/addons/skin.estuary/addon.xml
 
 systemctl restart kodi.service
+echo "pause for 30 seconds for kodi to restart"
+sleep 30
+
+#deactivate screensaver for the session
+kodi-send -a "InhibitScreensaver(true)"
+
+#view expert
+kodi-send -a "ActivateWindow(10032)" -d $send_delay
+kodi-send -a "settingslevelchange" -d $send_delay
+kodi-send -a "settingslevelchange" -d $send_delay
+
+#enable addons from unknown sources
+kodi-send -a "ActivateWindow(10016)" -d $send_delay
+kodi-send -a "SetFocus(-195)" -d $send_delay
+kodi-send -a "SetFocus(-174)" -d $send_delay
+kodi-send -a "Action(Select)" -d $send_delay
+kodi-send -a "SetFocus(11)" -d $send_delay
+kodi-send -a "Action(Select)" -d $send_delay
+
+export NEWT_COLORS='
+checkbox=black,lightgray
+'
+
+menu_options=("arch" "Arch" OFF
+              "awxi" "AWXi" OFF
+              "chorus" "Chorus" OFF
+              "chorus2" "Chorus2" ON
+              "hax" "Hax" OFF
+              "partymode" "PartyMode" OFF
+              "tex" "Tex" OFF)
+
+WEBGUI=$(whiptail --notags --title "WebInterfaces" --cancel-button "No Webinterface" --radiolist \
+"What WebInterface do you want?" 15 60 8 \
+"${menu_options[@]}" 3>&1 1>&2 2>&3)
+
+output=$?
+
+case $output in
+0)
+	#WEBGUI=chorus
+	
+	case $WEBGUI in
+	arch|awxi|chorus|hax|partymode|tex)
+		#install chorus webinterface
+		kodi-send -a "InstallAddon(webinterface."$WEBGUI")" -d $send_delay
+		kodi-send -a "SetFocus(11)" -d $send_delay
+		kodi-send -a "Action(Select)" -d $send_delay
+
+		kodi-send -a "Notification(Please wait,Just 60 seconds,60000))"
+		#read -n 1 -s -r -p "Press any key to continue"
+
+		sleep 60
+
+		kodi-send -a "ActivateWindow(10018)" -d $send_delay
+		kodi-send -a "SetFocus(-199)" -d $send_delay
+		kodi-send -a "SetFocus(-173)" -d $send_delay
+		kodi-send -a "Action(Select)" -d $send_delay
+		kodi-send -a "Action(UP)" -d $send_delay
+		kodi-send -a "Action(Select)" -d $send_delay
+		kodi-send -a "ActivateWindow(10000)" -d $send_delay
+		;;
+	chorus2)
+		#allow remote control needed for chorus2
+		kodi-send -a "ActivateWindow(10018)" -d $send_delay
+		kodi-send -a "SetFocus(-199)" -d $send_delay
+		kodi-send -a "SetFocus(-169)" -d $send_delay
+		kodi-send -a "Action(Select)" -d $send_delay
+		kodi-send -a "SetFocus(11)" -d $send_delay
+		kodi-send -a "Action(Select)" -d $send_delay
+		kodi-send -a "SetFocus(11)" -d $send_delay
+		kodi-send -a "Action(Select)" -d $send_delay
+
+		kodi-send -a "ActivateWindow(10000)" -d 1000
+
+		#install chorus2 webinterface
+		mkdir -p $home_path/temp/kodi_package/webinterface.default.chorus2
+		cd $home_path/temp/
+		wget -q -nv https://github.com/xbmc/chorus2/archive/refs/heads/master.zip
+		unzip  -qq master.zip
+		cp -r chorus2-master/dist/* kodi_package/webinterface.default.chorus2/
+		cd $home_path/temp/kodi_package/
+		zip -qqr ../webinterface.default.chorus2-custom.zip webinterface.default.chorus2
+		cd $home_path/temp/
+		mv webinterface.default.chorus2-custom.zip $home_path/
+		cd $home_path/
+		chown $user:$group webinterface.default.chorus2-custom.zip
+		rm -rf $home_path/temp/
+
+		#install zip chorus2 is immediately active
+		kodi-send -a "InstallFromZip" -d $send_delay
+		kodi-send -a "Action(Down)" -d $send_delay
+		kodi-send -a "Action(Select)" -d $send_delay
+		kodi-send -a "Action(Down)" -d $send_delay
+		kodi-send -a "Action(Select)" -d $send_delay
+
+		kodi-send -a "ActivateWindow(10000)" -d 1000
+		;;
+	*|none)
+		;;
+	esac
+	;;
+1)
+	;;
+esac
+
+TERM=ansi whiptail --title "Installation done" --infobox "Script finished, installation done" 7 60
