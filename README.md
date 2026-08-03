@@ -13,6 +13,7 @@ this little script installs kodi on raspbian bookworm/trixie (lite is assumed) I
 * preconfigure the addons with kodi-send and json
 
 Now with some whiptail gui parts
+
 Installation Information
 ![Installation Information](https://github.com/MarkusLange/install_kodi_on_raspbian/blob/main/screenshots/Installation_Information.PNG?raw=true)
 Ask about the WebInterface
