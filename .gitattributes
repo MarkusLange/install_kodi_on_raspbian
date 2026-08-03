@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+install_kodi_trixie.bash
+install_kodi_bookworm.bash
