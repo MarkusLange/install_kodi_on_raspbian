@@ -7,6 +7,8 @@ this little script installs kodi on raspbian bookworm/trixie (lite is assumed) I
 * it adds the https://www.deb-multimedia.org repository to add the rar-archieve package and put the priority down to not interfere raspbian (trixie only)
 * it installs archive and rar-archive support
 * it installs iptvsimple
+* sets settingslevel view to expert
+* enables addons from unkown source (e.g. from zip) 
 * add polkit rules to the user who runs kodi so you can shut it down from the interface (trixie only)
 * creates advancedsettings to show the temperatue of the pi correctly
 * installs a webinterface of your choise (Arch, AWXi, Chorus, Chorus2, Hax, PartyMode, Tex) or none
