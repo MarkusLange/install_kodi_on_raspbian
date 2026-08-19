@@ -130,31 +130,29 @@ send_delay=350
 echo "pause for 30 seconds for kodi to startup"
 sleep 30
 
+#deactivate screensaver for the session
 kodi-send -a "InhibitScreensaver(true)"
-#exit
 
 #enable version check (bookworm), enable spectrum (trixie)
 kodi-send -a "SetFocus(11)" -d $send_delay
 kodi-send -a "Action(Select, 10100)" -d $send_delay
-
 kodi-send -a "SetFocus(28)" -d $send_delay
 kodi-send -a "Action(Select, 10140)" -d $send_delay
 
 #enable service webinterface & json on port 80
 kodi-send -a "ActivateWindow(10018)" -d $send_delay
 kodi-send -a "SetFocus(-199)" -d $send_delay
+#disable Require authentication
 kodi-send -a "SetFocus(-177)" -d $send_delay
 kodi-send -a "Action(Select)" -d $send_delay
-
 kodi-send -a "SetFocus(11)" -d $send_delay
 kodi-send -a "Action(Select)" -d $send_delay
-
+#Allow remote control via HTTP
 kodi-send -a "SetFocus(-179)" -d $send_delay
 kodi-send -a "Action(Select)" -d $send_delay
-
 kodi-send -a "SetFocus(11)" -d $send_delay
 kodi-send -a "Action(Select)" -d $send_delay
-
+#change port from 8080 to 80
 kodi-send -a "SetFocus(-178)" -d $send_delay
 kodi-send -a "Action(Backspace)" -d $send_delay
 kodi-send -a "Action(Backspace)" -d $send_delay
@@ -202,30 +200,31 @@ window_id=-1
 echo "enter loop"
 while [[ $window_id != 10000 ]]
 do
-  window_id=$(curl -s http://localhost/jsonrpc -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","method":"GUI.GetProperties","params":{"properties":["currentwindow"]},"id":1}')
-  window_id=$(echo $window_id | cut -d: -f6 | cut -d, -f1)
-  echo $window_id
+	#window_id=$(curl -s http://user:password@localhost/jsonrpc -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","method":"GUI.GetProperties","params":{"properties":["currentwindow"]},"id":1}')
+	window_id=$(curl -s http://localhost/jsonrpc -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","method":"GUI.GetProperties","params":{"properties":["currentwindow"]},"id":1}')
+	window_id=$(echo $window_id | cut -d: -f6 | cut -d, -f1)
+	echo $window_id
 
-  case $window_id in
-  10100)
+	case $window_id in
+	10100)
 		sleep 0.5
-        kodi-send -a "SetFocus(11)" -d $send_delay
-        kodi-send -a "Action(Select)" -d $send_delay
+		kodi-send -a "SetFocus(11)" -d $send_delay
+		kodi-send -a "Action(Select)" -d $send_delay
 		sleep 0.5
-        ;;
-  10140)
-        sleep 0.5
-        kodi-send -a "SetFocus(28)" -d $send_delay
-        kodi-send -a "Action(Select)" -d $send_delay
+		;;
+	10140)
 		sleep 0.5
-        ;;
-  12000)
+		kodi-send -a "SetFocus(28)" -d $send_delay
+		kodi-send -a "Action(Select)" -d $send_delay
 		sleep 0.5
-        kodi-send -a "SetFocus(7)" -d $send_delay
-        kodi-send -a "Action(Select)" -d $send_delay
+		;;
+	12000)
 		sleep 0.5
-        ;;
-  esac
+		kodi-send -a "SetFocus(7)" -d $send_delay
+		kodi-send -a "Action(Select)" -d $send_delay
+		sleep 0.5
+		;;
+	esac
 done
 echo "end loop"
 
@@ -290,7 +289,7 @@ case $output in
 	
 	case $WEBGUI in
 	arch|awxi|chorus|hax|partymode|tex)
-		#install chorus webinterface
+		#install webinterface
 		kodi-send -a "InstallAddon(webinterface."$WEBGUI")" -d $send_delay
 		kodi-send -a "SetFocus(11)" -d $send_delay
 		kodi-send -a "Action(Select)" -d $send_delay
@@ -332,7 +331,7 @@ case $output in
 		cd $home_path/temp/
 		mv webinterface.default.chorus2-custom.zip $home_path/
 		cd $home_path/
-		chown $user:$group webinterface.default.chorus2-custom.zip
+		#chown $user:$group webinterface.default.chorus2-custom.zip
 		rm -rf $home_path/temp/
 
 		#install zip chorus2 is immediately active
@@ -341,6 +340,8 @@ case $output in
 		kodi-send -a "Action(Select)" -d $send_delay
 		kodi-send -a "Action(Down)" -d $send_delay
 		kodi-send -a "Action(Select)" -d $send_delay
+		sleep 10
+		rm -f webinterface.default.chorus2-custom.zip
 
 		kodi-send -a "ActivateWindow(10000)" -d 1000
 		;;
@@ -352,4 +353,5 @@ case $output in
 	;;
 esac
 
+#https://github.com/JazerBarclay/whiptail-examples/blob/master/info-dialog.sh
 TERM=ansi whiptail --title "Installation done" --infobox "Script finished, installation done" 7 60
